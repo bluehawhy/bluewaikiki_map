@@ -1,5 +1,5 @@
 import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.17.0/dist/maplibre-gl.mjs';
-import {createMap, DEFAULT_ROAD_STYLE_WIDTHS, normalizeRoadStyleWidths} from './map.js?v=map-startup-fix-20261112';
+import {createMap, DEFAULT_ROAD_STYLE_WIDTHS, normalizeRoadStyleWidths} from './map.js?v=road-defaults-2x-20261112';
 
 const status = document.getElementById('map-status');
 const dot = document.getElementById('map-dot');
@@ -13,20 +13,13 @@ const centerWidthInput = document.getElementById('center-line-width');
 const roadWidthInput = document.getElementById('road-width');
 const centerWidthValue = document.getElementById('center-line-width-value');
 const roadWidthValue = document.getElementById('road-width-value');
-const ROAD_STYLE_STORAGE_KEY = 'bluewaikiki-map-road-widths-v2';
-const LEGACY_LINE_STORAGE_KEY = 'bluewaikiki-map-road-line-widths-v1';
-
+const ROAD_STYLE_STORAGE_KEY = 'bluewaikiki-map-road-widths-v3';
+// The v3 key deliberately does not migrate old overrides: all browsers
+// should start from the newly approved project-wide 2x / 1.5px defaults.
 function readRoadStyleWidths() {
   try {
     const value = window.localStorage.getItem(ROAD_STYLE_STORAGE_KEY);
     if (value) return normalizeRoadStyleWidths(JSON.parse(value));
-    // Preserve an existing customized centerline width, but the old 'lane'
-    // field controlled white dashed markings, not asphalt surface width.
-    const legacy = window.localStorage.getItem(LEGACY_LINE_STORAGE_KEY);
-    if (legacy) {
-      const parsed = JSON.parse(legacy);
-      return normalizeRoadStyleWidths({road: 1, center: parsed.center});
-    }
   } catch (error) {
     console.warn('Could not read saved road styling:', error);
   }

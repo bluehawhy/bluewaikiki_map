@@ -29,9 +29,10 @@ const BUILDING_DATA_LAYER = 'bluewaikiki-3d-buildings-with-data';
 const THREE_D_VIEW = Object.freeze({pitch: 58, bearing: -16, minZoom: 15.5});
 
 // Adjustable road surface thickness and centerline width.
-// 'road' scales all asphalt surfaces, their borders and lane offsets;
-// 'center' controls only the yellow solid centerline (zoom 17 reference).
-export const DEFAULT_ROAD_STYLE_WIDTHS = Object.freeze({road: 1, center: 0.65});
+// 'road' is the visual multiplier relative to the original 1x road design.
+// The underlying MapLibre style JSON now contains the approved 2x surfaces,
+// matching 'center' = 1.5px at zoom 17 even outside this web application.
+export const DEFAULT_ROAD_STYLE_WIDTHS = Object.freeze({road: 2, center: 1.5});
 const ROAD_SURFACE_IDS = Object.freeze([
   'major-roads', 'major-roads-border', 'local-roads', 'local-roads-border',
 ]);
@@ -108,7 +109,7 @@ export function createMap({
   let originalRoadPaint = new Map();
   const map = new lib.Map({
     container,
-    style: styleUrl || new URL('./styles/bus_transit_style.json', import.meta.url).href,
+    style: styleUrl || new URL('./styles/bus_transit_style.json?v=road-defaults-2x-20261112', import.meta.url).href,
     center: [...INITIAL_VIEW.center],
     zoom: INITIAL_VIEW.zoom,
     minZoom: 3,
@@ -187,12 +188,12 @@ export function createMap({
       map.setPaintProperty(id, property, scaledPaint(original, factor));
     }
     for (const id of ROAD_SURFACE_IDS) {
-      apply(id, 'line-width', roadStyleWidths.road);
+      apply(id, 'line-width', roadStyleWidths.road / DEFAULT_ROAD_STYLE_WIDTHS.road);
     }
     for (const id of ROAD_SEPARATOR_IDS) {
       // Move dashed separators with the asphalt width, keeping them aligned
       // with the virtual lane boundaries without changing their stroke width.
-      apply(id, 'line-offset', roadStyleWidths.road);
+      apply(id, 'line-offset', roadStyleWidths.road / DEFAULT_ROAD_STYLE_WIDTHS.road);
     }
     apply(ROAD_CENTER_ID, 'line-width',
       roadStyleWidths.center / DEFAULT_ROAD_STYLE_WIDTHS.center);
