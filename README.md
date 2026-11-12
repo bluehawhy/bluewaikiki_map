@@ -10,7 +10,7 @@ DB와 지도 다운로드를 준비하기 전에도 **버스타이머와 동일�
 - `web/map.js` — OpenMapTiles `building` 레이어의 `render_height`/`render_min_height`로 3D 건물 입체화. 3D 진입 시 기울기 58°, 최소 확대 15.5 적용. **속성이 있는 건물은 연주황 `#F5C79F`에 투명도 30%, 그 외 건물은 기존 베이지 `#DDCEB5`에 투명도 50%.** 3D에서는 겹치는 도로명 표시를 숨기고 2D에서는 복원
 - `web/map.js` — 프레임워크 독립 MapLibre 지도 모듈 (추후 React/Vue 등에서 재사용)
 - `web/feature-inspector.js` — 도로·건물 클릭 시 선택 강조 및 실제 벡터 타일 속성 조회
-- `web/main.js` — 도로·건물 속성 모달, GeoJSON 원본 확인·복사. 우측 **⚙ 차선 두께 설정**에서 중앙선(기본 0.65px)·구분선(기본 1px)을 실시간 조절하고 브라우저에 저장(기본값 복원 가능)
+- `web/main.js` — 도로·건물 속성 모달, GeoJSON 원본 확인·복사. 우측 **⚙ 도로 폭 설정**에서 아스팔트 도로 폭(기본 1.0배, 0.5~3배)과 황색 중앙선(기본 0.65px)을 각각 실시간 조절하고 브라우저에 저장(기본값 복원 가능)
 - `web/styles/bus_transit_style.json` — 버스타이머 스타일 기반 사용자 지정 지도. `motorway` 6차로, `trunk`/`primary` 4차로, `secondary`/`tertiary` 2차로, `minor`/`service` 왕복 공유 1차로(폭 0.5배)를 적용. `oneway=1/-1`이면 표시 차로 수와 도로 폭 절반, 2차로 이상이면 중앙선·차로 구분선 표시. 노면 `#656C74`(아스팔트 회색), 외곽 `#414953`(짙은 회색), 중앙선 `#F4C542`(황색 실선), 차로선 `#FFFFFF`(백색 점선)을 사용하고 `surface`별 스타일은 아직 미적용
 - 벡터 지도: OpenFreeMap 제공 / OpenMapTiles 형식 / OSM 원천
 - 초기 중심: 부산 연제구, 줌 14

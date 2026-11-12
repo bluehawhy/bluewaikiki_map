@@ -173,7 +173,7 @@ button { font: inherit; }
 .feature-modal__copy:hover { background: #d9eee6; }
 .feature-modal :is(button,summary):focus-visible { outline: 2px solid #299f96; outline-offset: 2px; }
 
-/* Compact lane marking thickness widget. Map geometry stays unchanged. */
+/* Road asphalt width and centerline thickness controls. */
 .map-actions button.map-actions__settings { font-size: 23px; line-height: 1; }
 .map-actions button.map-actions__settings[aria-expanded="true"] {
   background: #e1f3ee; color: #127a69;
@@ -210,7 +210,7 @@ button { font: inherit; }
 .road-style-panel__label output { font-size: 12px; font-weight: 750; font-variant-numeric: tabular-nums; }
 .road-style-panel__sample { width: 24px; height: 0; border-top: 2px solid; }
 .road-style-panel__sample--center { border-color: #e5ae18; }
-.road-style-panel__sample--lane { border-color: #9aa8b6; border-top-style: dashed; }
+.road-style-panel__sample--road { border-color: #656C74; border-top-width: 6px; }
 .road-style-panel__field input[type="range"] {
   display: block; width: 100%; margin: 0; accent-color: #248e7a; cursor: pointer;
 }
