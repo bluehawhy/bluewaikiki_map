@@ -86,6 +86,17 @@ function clearDialog() {
   if (dialog.open) dialog.close();
 }
 
+dialog.addEventListener('click', event => {
+  // A native <dialog> dispatches backdrop clicks to the dialog itself.
+  // Only close when the pointer is outside its visible rectangle so clicks
+  // on the modal content (including blank/padded areas) do not dismiss it.
+  if (event.target !== dialog) return;
+  const bounds = dialog.getBoundingClientRect();
+  const outside = event.clientX < bounds.left || event.clientX > bounds.right
+    || event.clientY < bounds.top || event.clientY > bounds.bottom;
+  if (outside) dialog.close();
+});
+
 dialog.addEventListener('close', () => controller?.clearFeatureSelection());
 document.getElementById('feature-modal-close').addEventListener('click', () => dialog.close());
 document.getElementById('feature-modal-copy').addEventListener('click', async () => {
