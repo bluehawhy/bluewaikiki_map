@@ -1,6 +1,6 @@
 {
   "version": 8,
-  "name": "Bus Timer Bright Transit",
+  "name": "BlueWaikiki Map — Lane-Scaled Transit Roads",
   "glyphs": "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
   "sources": {
     "openmaptiles": {
@@ -113,12 +113,66 @@
           [
             "zoom"
           ],
-          11,
-          0.5,
+          10,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "minor",
+            0.288,
+            "residential",
+            0.288,
+            "service",
+            0.288,
+            0.5
+          ],
           14,
-          3,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "minor",
+            1.2,
+            "residential",
+            1.2,
+            "service",
+            1.2,
+            0.5
+          ],
           17,
-          11
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "minor",
+            3.84,
+            "residential",
+            3.84,
+            "service",
+            3.84,
+            0.5
+          ],
+          19,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "minor",
+            7.68,
+            "residential",
+            7.68,
+            "service",
+            7.68,
+            0.5
+          ]
         ]
       }
     },
@@ -149,12 +203,66 @@
           [
             "zoom"
           ],
-          11,
-          0.3,
+          10,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "minor",
+            0.24,
+            "residential",
+            0.24,
+            "service",
+            0.24,
+            0.5
+          ],
           14,
-          1.9,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "minor",
+            1,
+            "residential",
+            1,
+            "service",
+            1,
+            0.5
+          ],
           17,
-          9.5
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "minor",
+            3.2,
+            "residential",
+            3.2,
+            "service",
+            3.2,
+            0.5
+          ],
+          19,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "minor",
+            6.4,
+            "residential",
+            6.4,
+            "service",
+            6.4,
+            0.5
+          ]
         ]
       }
     },
@@ -177,7 +285,18 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#F3D17A",
+        "line-color": [
+          "match",
+          [
+            "get",
+            "class"
+          ],
+          "motorway",
+          "#B78038",
+          "trunk",
+          "#C99750",
+          "#F3D17A"
+        ],
         "line-width": [
           "interpolate",
           [
@@ -187,12 +306,83 @@
             "zoom"
           ],
           10,
-          1.2,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "motorway",
+            1.915,
+            "trunk",
+            1.277,
+            "primary",
+            1.075,
+            "secondary",
+            0.538,
+            "tertiary",
+            0.538,
+            0.5
+          ],
           14,
-          6.8,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "motorway",
+            7.98,
+            "trunk",
+            5.32,
+            "primary",
+            4.48,
+            "secondary",
+            2.24,
+            "tertiary",
+            2.24,
+            0.5
+          ],
           17,
-          19
-        ]
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "motorway",
+            25.536,
+            "trunk",
+            17.024,
+            "primary",
+            14.336,
+            "secondary",
+            7.168,
+            "tertiary",
+            7.168,
+            0.5
+          ],
+          19,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "motorway",
+            51.072,
+            "trunk",
+            34.048,
+            "primary",
+            28.672,
+            "secondary",
+            14.336,
+            "tertiary",
+            14.336,
+            0.5
+          ]
+        ],
+        "line-opacity": 0.96
       }
     },
     {
@@ -224,11 +414,81 @@
             "zoom"
           ],
           10,
-          0.7,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "motorway",
+            1.44,
+            "trunk",
+            0.96,
+            "primary",
+            0.96,
+            "secondary",
+            0.48,
+            "tertiary",
+            0.48,
+            0.5
+          ],
           14,
-          5.4,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "motorway",
+            6,
+            "trunk",
+            4,
+            "primary",
+            4,
+            "secondary",
+            2,
+            "tertiary",
+            2,
+            0.5
+          ],
           17,
-          17.4
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "motorway",
+            19.2,
+            "trunk",
+            12.8,
+            "primary",
+            12.8,
+            "secondary",
+            6.4,
+            "tertiary",
+            6.4,
+            0.5
+          ],
+          19,
+          [
+            "match",
+            [
+              "get",
+              "class"
+            ],
+            "motorway",
+            38.4,
+            "trunk",
+            25.6,
+            "primary",
+            25.6,
+            "secondary",
+            12.8,
+            "tertiary",
+            12.8,
+            0.5
+          ]
         ]
       }
     },

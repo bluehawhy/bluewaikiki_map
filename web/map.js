@@ -28,8 +28,8 @@ const BUILDING_LAYER = 'bluewaikiki-3d-buildings';
 const BUILDING_DATA_LAYER = 'bluewaikiki-3d-buildings-with-data';
 const THREE_D_VIEW = Object.freeze({pitch: 58, bearing: -16, minZoom: 15.5});
 
-// Original Bus Timer Style JSON stays unchanged. Enable 3D as a runtime layer,
-// so future adjustments to the 2D style do not require rebuilding the map.
+// The local map style is based on Bus Timer and now has lane-count-based road widths.
+// 3D buildings remain runtime layers so their design stays independent of road styling.
 function add3DBuildingLayer(map) {
   if (!map.getSource('openmaptiles')) return;
   const existingBase = map.getLayer('major-place-labels') ? 'major-place-labels' : undefined;

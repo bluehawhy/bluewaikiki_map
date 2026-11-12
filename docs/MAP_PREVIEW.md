@@ -4,7 +4,7 @@
 
 ## 사용 기술
 - 렌더러: MapLibre GL JS 6.17.0 (ES Module CDN)
-- 스타일: `web/styles/bus_transit_style.json` — `bluehawhy/busstop_timer/assets/map/bus_transit_style.json` 원본과 동일
+- 스타일: `web/styles/bus_transit_style.json` — `bluehawhy/busstop_timer/assets/map/bus_transit_style.json` 원본에서 분기한 사용자 지정 스타일. 건물·배경 구조는 유지하고 도로 폭/외곽선 규칙을 개편.
 - 벡터 타일: OpenFreeMap `https://tiles.openfreemap.org/planet` (OpenMapTiles 스키마, OSM 원천)
 - 초기 위치: 부산 연제구 `[129.0756, 35.1796]`, 줌 14 (버스타이머와 동일)
 - 오른쪽 **3D** 버튼: 건물 돌출(`fill-extrusion`), 지도 기울기 58°와 회전 -16° 적용. 버튼이 **2D**로 바뀌며 다시 누르면 평면 지도로 돌아옴. 초기 위치 복귀는 현재 2D/3D 모드를 유지.
@@ -14,12 +14,31 @@
 - 3D에서 건물 뒤/위로 겹쳐 보이는 도로명 텍스트는 `road-labels` 레이어를 숨겨 제거. 2D에서는 도로명을 다시 표시.
 - 3D 건물은 OpenMapTiles `building`의 `render_height`·`render_min_height`를 활용하며 데이터에 높이가 없다면 기본 9m를 사용. `hide_3d`가 참인 건물 외곽은 3D에서 제외.
 - **지형 고도(DEM), 위성 영상, 별도 3D 모델은 사용하지 않음.** OSM 건물 높이는 지역별로 정확도가 다를 수 있으며 정밀 실측 정보가 아님.
-- 3D 레이어는 `web/map.js`에서 실행 시 추가하므로 기존 버스타이머의 2D 스타일 JSON을 변경하지 않음.
+- 3D 레이어는 `web/map.js`에서 실행 시 추가하며, 2D/3D가 공유하는 도로 색상·너비는 `web/styles/bus_transit_style.json`에서 관리함.
 - **도로/건물 클릭 속성 모달**: `queryRenderedFeatures()`로 현재 렌더링된 `transportation` 도로 또는 `building` 건물을 검색하고, 클릭 객체를 주황색으로 강조. 속성 전체와 실제 GeoJSON(타일 범위 기하)을 표시하며 JSON 복사 가능. 2D/3D 모두 동일하게 작동.
 - 작은 도로는 클릭 지점 주변 12px에서 가까운 선형을 찾아 선택. 건물 폴리곤/3D 건물과 겹치면 건물 선택을 우선함.
 - 조회 결과는 타일에 포함된 속성만 표시하며 원본 OSM 전체 속성, 실제 도로 전체 형상, 정밀 실측 높이를 보장하지 않음.
 - 정류장·실시간 교통정보·사용자 계정은 표시하지 않음. 추후 별도 API 연동.
 - DB 및 다운로드 기능 미구성 상태에서도 지도 화면은 표시됨. 지도 타일/글리프 및 CDN 네트워크는 필요.
+
+## 도로 차로 수 기반 너비 및 외곽선
+
+차로 수는 **실제 OSM의 `lanes` 실측 정보가 아닌 지도 표시용 가정값**이며, 방향별 차로 표시는 아직 하지 않습니다.
+
+| 도로 스타일 레이어 | OpenMapTiles `class` | 왕복 총 차로 수 | 줌 14 도로 내부 | 줌 17 도로 내부 |
+|---|---|---:|---:|---:|
+| `major-roads` | `motorway` | 6 | 6px | 19.2px |
+| `major-roads` | `trunk`, `primary` | 4 | 4px | 12.8px |
+| `major-roads` | `secondary`, `tertiary` | 2 | 2px | 6.4px |
+| `local-roads` | `minor`, `service` | 1 | 1px | 3.2px |
+| `pedestrian-paths` | `path` | 0 | 기존 너비 | 기존 너비 |
+
+- 기존 필터의 `residential`은 `minor`와 동일한 1차로 표시 규칙을 유지합니다. 다만 표준 OpenMapTiles는 주거지 도로를 보통 `minor`로 정규화합니다.
+- `major-roads-border`는 `motorway`와 `trunk`에서 진한 황갈색 외곽선을 두껍게 표시합니다(내부 너비의 **1.33배**로 외곽을 그려 양쪽 선이 노출됨). 그 외 주요 도로는 기존 연한 외곽선으로 최소한만 표시합니다(1.12배).
+- `local-roads-border`는 내부 너비의 **1.2배**를 사용합니다. 도로 내부/외곽선 모두 같은 차로 배율을 적용하므로 1차로가 2차로만큼 굵어지지 않습니다.
+- 확대/축소 시 차로당 픽셀 폭을 선형 보간합니다. 줌 14=1px, 줌 17=3.2px, 줌 19=6.4px이며, `surface`는 이번 변경에서 색상·너비에 영향을 주지 않습니다.
+- `track`, `raceway`, `busway`, `bus_guideway`, `ferry`는 기존 도로 스타일 레이어와 연결되지 않아 이번 너비 규칙의 적용 대상이 아닙니다. 교량·터널 여부나 실제 지상 차로 개수도 추정에 반영하지 않습니다.
+- 기존 도로 선택/속성 모달과 선택 강조 레이어는 그대로 유지됩니다. **차로 개수로 실제 도로 폭을 계산한 것이 아니라 화면 픽셀 너비만 변경한 것**입니다.
 
 ## 대시보드 웹 빌드 (DB 설치 불필요)
 
