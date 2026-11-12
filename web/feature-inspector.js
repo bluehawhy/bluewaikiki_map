@@ -37,7 +37,9 @@ function distanceToLine(point, geometry, map) {
 function clickedFeature(map, point, threeDEnabled) {
   // Building takes priority over roads if its footprint/wall occupies the pixel.
   const buildingLayers = readyLayers(map,
-    threeDEnabled ? ['bluewaikiki-3d-buildings'] : ['buildings']);
+    threeDEnabled
+      ? ['bluewaikiki-3d-buildings-with-data', 'bluewaikiki-3d-buildings']
+      : ['buildings']);
   if (buildingLayers.length) {
     const hit = map.queryRenderedFeatures(point, {layers: buildingLayers})
       .find(f => f.source === 'openmaptiles' && f.sourceLayer === 'building');

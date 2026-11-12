@@ -25,36 +25,49 @@ const BUILDING_COLOR_EXPRESSION = ['case', HAS_BUILDING_DATA, BUILDING_DATA_COLO
 const BUILDING_OPACITY_EXPRESSION = ['case', HAS_BUILDING_DATA,
   BUILDING_DATA_OPACITY, BUILDING_OPACITY];
 const BUILDING_LAYER = 'bluewaikiki-3d-buildings';
+const BUILDING_DATA_LAYER = 'bluewaikiki-3d-buildings-with-data';
 const THREE_D_VIEW = Object.freeze({pitch: 58, bearing: -16, minZoom: 15.5});
 
 // Original Bus Timer Style JSON stays unchanged. Enable 3D as a runtime layer,
 // so future adjustments to the 2D style do not require rebuilding the map.
 function add3DBuildingLayer(map) {
-  if (!map.getSource('openmaptiles') || map.getLayer(BUILDING_LAYER)) return;
-  map.addLayer({
-    id: BUILDING_LAYER,
-    type: 'fill-extrusion',
-    source: 'openmaptiles',
-    'source-layer': 'building',
-    minzoom: 14,
-    filter: ['!=', ['get', 'hide_3d'], true],
-    layout: {visibility: 'none'},
-    paint: {
-      'fill-extrusion-color': BUILDING_COLOR_EXPRESSION,
-      'fill-extrusion-opacity': BUILDING_OPACITY_EXPRESSION,
-      'fill-extrusion-vertical-gradient': true,
-      // OpenMapTiles render_height / render_min_height include OSM level data
-      // and can be estimated when the original building height is unavailable.
-      'fill-extrusion-height': [
-        'interpolate', ['linear'], ['zoom'],
-        14, 0, 15.5, ['max', 3, ['coalesce', ['get', 'render_height'], 9]],
+  if (!map.getSource('openmaptiles')) return;
+  const existingBase = map.getLayer('major-place-labels') ? 'major-place-labels' : undefined;
+  // fill-extrusion-opacity is *layer-wide* in MapLibre. Use two layers so
+  // individual building properties can choose truly different opacities.
+  const height = [
+    'interpolate', ['linear'], ['zoom'],
+    14, 0, 15.5, ['max', 3, ['coalesce', ['get', 'render_height'], 9]],
+  ];
+  const base = [
+    'interpolate', ['linear'], ['zoom'],
+    14, 0, 15.5, ['max', 0, ['coalesce', ['get', 'render_min_height'], 0]],
+  ];
+  for (const variant of [
+    {id: BUILDING_LAYER, data: false, color: BUILDING_COLOR, opacity: BUILDING_OPACITY},
+    {id: BUILDING_DATA_LAYER, data: true, color: BUILDING_DATA_COLOR, opacity: BUILDING_DATA_OPACITY},
+  ]) {
+    if (map.getLayer(variant.id)) continue;
+    map.addLayer({
+      id: variant.id,
+      type: 'fill-extrusion',
+      source: 'openmaptiles',
+      'source-layer': 'building',
+      minzoom: 14,
+      filter: ['all',
+        ['!=', ['get', 'hide_3d'], true],
+        variant.data ? HAS_BUILDING_DATA : ['!', HAS_BUILDING_DATA],
       ],
-      'fill-extrusion-base': [
-        'interpolate', ['linear'], ['zoom'],
-        14, 0, 15.5, ['max', 0, ['coalesce', ['get', 'render_min_height'], 0]],
-      ],
-    },
-  }, map.getLayer('major-place-labels') ? 'major-place-labels' : undefined);
+      layout: {visibility: 'none'},
+      paint: {
+        'fill-extrusion-color': variant.color,
+        'fill-extrusion-opacity': variant.opacity,
+        'fill-extrusion-vertical-gradient': true,
+        'fill-extrusion-height': height,
+        'fill-extrusion-base': base,
+      },
+    }, existingBase);
+  }
 }
 
 export function createMap({
@@ -87,8 +100,10 @@ export function createMap({
   function updateBuildingLayers() {
     if (!map.getSource('openmaptiles')) return;
     add3DBuildingLayer(map);
-    if (map.getLayer(BUILDING_LAYER)) {
-      map.setLayoutProperty(BUILDING_LAYER, 'visibility', threeDEnabled ? 'visible' : 'none');
+    for (const id of [BUILDING_LAYER, BUILDING_DATA_LAYER]) {
+      if (map.getLayer(id)) {
+        map.setLayoutProperty(id, 'visibility', threeDEnabled ? 'visible' : 'none');
+      }
     }
     // Keep both flat footprints and 3D volumes a soft translucent beige.
     if (map.getLayer('buildings')) {
