@@ -7,8 +7,10 @@ BlueWaikiki의 **지도 데이터 수집·보관·조회 전용 프로젝트**. 
 DB와 지도 다운로드를 준비하기 전에도 **버스타이머와 동일한 지도 스타일**을 바로 확인할 수 있습니다.
 
 - `web/index.html` — 브라우저 전체 화면 지도, 이동·확대·축소·초기 위치 복귀 및 **2D/3D 전환 버튼**
-- `web/map.js` — OpenMapTiles `building` 레이어의 `render_height`/`render_min_height`로 3D 건물 입체화. 3D 진입 시 기울기 58°, 최소 확대 15.5 적용. 2D·3D 건물은 베이지 `#DDCEB5`에 50% 투명도, 3D에서는 겹치는 도로명 표시를 숨기고 2D에서는 복원
+- `web/map.js` — OpenMapTiles `building` 레이어의 `render_height`/`render_min_height`로 3D 건물 입체화. 3D 진입 시 기울기 58°, 최소 확대 15.5 적용. **속성이 있는 건물은 연주황 `#F5C79F`에 투명도 30%, 그 외 건물은 기존 베이지 `#DDCEB5`에 투명도 50%.** 3D에서는 겹치는 도로명 표시를 숨기고 2D에서는 복원
 - `web/map.js` — 프레임워크 독립 MapLibre 지도 모듈 (추후 React/Vue 등에서 재사용)
+- `web/feature-inspector.js` — 도로·건물 클릭 시 선택 강조 및 실제 벡터 타일 속성 조회
+- `web/main.js` — 도로·건물 속성 모달, GeoJSON 원본 확인·복사
 - `web/styles/bus_transit_style.json` — 버스타이머 지도 스타일 원본 복제
 - 벡터 지도: OpenFreeMap 제공 / OpenMapTiles 형식 / OSM 원천
 - 초기 중심: 부산 연제구, 줌 14

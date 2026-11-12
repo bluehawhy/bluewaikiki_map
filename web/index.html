@@ -31,6 +31,29 @@
       <span class="map-actions__divider" aria-hidden="true"></span>
       <button type="button" class="map-actions__mode" id="toggle-3d" aria-label="3D 건물 보기" aria-pressed="false" title="건물 입체화" disabled>3D</button>
     </div>
+    <dialog id="feature-modal" class="feature-modal" aria-labelledby="feature-modal-title">
+      <header class="feature-modal__head">
+        <div class="feature-modal__heading">
+          <span class="feature-modal__eyebrow" id="feature-kind">벡터 타일 객체</span>
+          <h2 id="feature-modal-title">속성 정보</h2>
+        </div>
+        <button id="feature-modal-close" class="feature-modal__close" type="button" aria-label="속성 창 닫기">×</button>
+      </header>
+      <div class="feature-modal__body">
+        <p class="feature-modal__note" id="feature-modal-note"></p>
+        <dl class="feature-modal__meta" id="feature-modal-meta"></dl>
+        <h3>타일에 포함된 속성</h3>
+        <dl class="feature-modal__properties" id="feature-modal-properties"></dl>
+        <details class="feature-modal__raw">
+          <summary>원본 GeoJSON 확인</summary>
+          <pre id="feature-modal-json"></pre>
+        </details>
+      </div>
+      <footer class="feature-modal__footer">
+        <span id="feature-modal-copy-status" class="feature-modal__copy-status" role="status"></span>
+        <button type="button" id="feature-modal-copy" class="feature-modal__copy">JSON 복사</button>
+      </footer>
+    </dialog>
     <div class="map-status-panel">
       <span class="map-status-panel__dot" id="map-dot" aria-hidden="true"></span>
       <span id="map-status" role="status" aria-live="polite">지도 타일을 불러오는 중…</span>
