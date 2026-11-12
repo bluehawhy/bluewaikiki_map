@@ -1,0 +1,9 @@
+{
+  "name": "bluewaikiki-map-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Framework-free OpenFreeMap/OSM map preview for BlueWaikiki Dashboard web build",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs"
+  }
+}

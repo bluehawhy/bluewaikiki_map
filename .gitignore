@@ -13,3 +13,8 @@ data/**
 !data/raw/.gitkeep
 !data/work/
 !data/work/.gitkeep
+
+# Dashboard static web build output
+dist/
+node_modules/
+npm-debug.log*

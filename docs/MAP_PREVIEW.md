@@ -10,6 +10,18 @@
 - 정류장·실시간 교통정보·사용자 계정은 표시하지 않음. 추후 별도 API 연동.
 - DB 및 다운로드 기능 미구성 상태에서도 지도 화면은 표시됨. 지도 타일/글리프 및 CDN 네트워크는 필요.
 
+## 대시보드 웹 빌드 (DB 설치 불필요)
+
+프로젝트 `main` 브랜치에 루트 `package.json`의 `build:web` 스크립트를 추가했습니다.
+
+1. BlueWaikiki 대시보드에서 GitHub 저장소 `bluehawhy/bluewaikiki_map` / `main` 연결
+2. 해당 프로젝트의 **웹 빌드** 실행
+3. 대시보드가 자동 생성된 `dist/index.html`을 `https://app.bluewaikiki.top/<slug>/`에 게시
+
+`scripts/build-web.mjs`는 `web/` 전체를 `dist/`로 복사하기만 합니다. 런타임 npm 패키지는 없으며 DB, PostGIS, 지도 ZIP 다운로드, Docker Compose 실행이 필요하지 않습니다.
+
+`index.html`의 `./main.js`, `./site.css`, `map.js`에서 참조하는 `./styles/*` 등 **상대 경로**는 대시보드의 `/<slug>/` 하위 경로에서도 그대로 동작하도록 유지합니다.
+
 ## 실행
 - 독립 정적 페이지: `cd web && python3 -m http.server 8000` 다음 `http://localhost:8000`
 - 기존 FastAPI: `python -m app.runner` 다음 `http://localhost:8080/` (필요한 Python 패키지 설치 시)

@@ -16,6 +16,18 @@ DB와 지도 다운로드를 준비하기 전에도 **버스타이머와 동일�
 
 간단한 미리보기: `cd web && python3 -m http.server 8000` → `http://localhost:8000/`
 
+### BlueWaikiki 대시보드 웹 빌드
+
+저장소 루트의 `package.json`에 `build:web`을 등록했습니다. 대시보드의 **웹 빌드** 버튼을 누르면 Node.js 빌드 컨테이너가 `npm ci && npm run build:web`을 수행하며, `web/` 정적 파일을 `dist/`에 복사해 게시합니다.
+
+- 공개 주소: `https://app.bluewaikiki.top/<대시보드 프로젝트 slug>/`
+- JS·CSS·스타일 JSON은 **상대 경로**를 사용하므로 하위 경로에서 로드됩니다.
+- React/Vite/Flutter 빌드나 DB 설치, PostGIS, API Docker 배포는 필요 없습니다.
+- 대시보드에서 GitHub 저장소 `bluehawhy/bluewaikiki_map`을 `main` 브랜치로 연결한 뒤 웹 빌드를 실행하면 됩니다.
+- 빌드에 사용하는 패키지 의존성은 없으며 `dist/`는 Git에서 제외됩니다.
+
+별도 로컬 빌드는 `npm ci && npm run build:web` 후 `dist/` 폴더를 정적 파일 서버로 제공하면 됩니다.
+
 기존 FastAPI Docker에서도 웹 루트 `/`로 함께 제공합니다. 대시보드 등록 시 `https://api.bluewaikiki.top/<slug>/` 경로를 지원합니다. DB/서버 배포는 아직 하지 않았습니다.
 
 자세한 구성: [지도 미리보기·프레임워크 연동](docs/MAP_PREVIEW.md).
@@ -72,11 +84,12 @@ docker compose up -d --build
 
 ### 조회 API
 
-`MAP_API_TOKEN`을 `Authorization: Bearer ...`로 넣어야 `/v1/*`를 호출할 수 있습니다. `/health`는 DB 연결·PostGIS·스키마 준비 여부를 표시합니다.
+`MAP_API_TOKEN`을 `Authorization: Bearer ...`로 넣어야 `/v1/*`를 호출할 수 있습니다. `/health`는 웹/API 서버 준비 상태만 표시하며, 독립 DB 상태는 `/v1/health/db`(Bearer 필요)에서 조회합니다.
 
 | 경로 | 데이터 |
 |---|---|
-| `/health` | DB 준비 상태 (미준비 시 503) |
+| `/health` | 웹/API 서버 준비 상태 (PostGIS 없이 사용 가능) |
+| `/v1/health/db` | 독립 PostGIS 및 지도 스키마 준비 상태 (Bearer 필요) |
 | `/v1/datasets` | 활성 자료 버전 |
 | `/v1/datasets/versions?dataset_key=...` | 자료 버전 이력 |
 | `/v1/layers` | 활성 레이어 |
