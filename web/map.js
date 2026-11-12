@@ -4,6 +4,9 @@ export const INITIAL_VIEW = Object.freeze({
   zoom: 14,
 });
 
+// Warm neutral building shade shared by 2D footprints and 3D extrusions.
+const BUILDING_COLOR = '#DDCEB5';
+const BUILDING_OPACITY = 0.5;
 const BUILDING_LAYER = 'bluewaikiki-3d-buildings';
 const THREE_D_VIEW = Object.freeze({pitch: 58, bearing: -16, minZoom: 15.5});
 
@@ -20,8 +23,8 @@ function add3DBuildingLayer(map) {
     filter: ['!=', ['get', 'hide_3d'], true],
     layout: {visibility: 'none'},
     paint: {
-      'fill-extrusion-color': '#C9D9E5',
-      'fill-extrusion-opacity': 0.94,
+      'fill-extrusion-color': BUILDING_COLOR,
+      'fill-extrusion-opacity': BUILDING_OPACITY,
       'fill-extrusion-vertical-gradient': true,
       // OpenMapTiles render_height / render_min_height include OSM level data
       // and can be estimated when the original building height is unavailable.
@@ -64,9 +67,16 @@ export function createMap({lib, container, styleUrl, onReady, onError, onModeCha
     if (map.getLayer(BUILDING_LAYER)) {
       map.setLayoutProperty(BUILDING_LAYER, 'visibility', threeDEnabled ? 'visible' : 'none');
     }
-    // Preserve Bus Timer's original flat buildings when returning to 2D.
+    // Keep both flat footprints and 3D volumes a soft translucent beige.
     if (map.getLayer('buildings')) {
+      map.setPaintProperty('buildings', 'fill-color', BUILDING_COLOR);
+      map.setPaintProperty('buildings', 'fill-opacity', BUILDING_OPACITY);
       map.setLayoutProperty('buildings', 'visibility', threeDEnabled ? 'none' : 'visible');
+    }
+    // Road-name symbols can render through/over extruded buildings.
+    // Hide road names in 3D; retain the familiar labels on the 2D map.
+    if (map.getLayer('road-labels')) {
+      map.setLayoutProperty('road-labels', 'visibility', threeDEnabled ? 'none' : 'visible');
     }
   }
 
