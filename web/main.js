@@ -1,5 +1,5 @@
 import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.17.0/dist/maplibre-gl.mjs';
-import {createMap, DEFAULT_ROAD_STYLE_WIDTHS, normalizeRoadStyleWidths} from './map.js';
+import {createMap, DEFAULT_ROAD_STYLE_WIDTHS, normalizeRoadStyleWidths} from './map.js?v=map-startup-fix-20261112';
 
 const status = document.getElementById('map-status');
 const dot = document.getElementById('map-dot');

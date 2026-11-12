@@ -99,12 +99,12 @@ function add3DBuildingLayer(map) {
 
 export function createMap({
   lib, container, styleUrl, onReady, onError, onModeChange, onFeatureSelect, onFeatureClear,
-  roadStyleWidths = DEFAULT_ROAD_STYLE_WIDTHS,
+  roadStyleWidths: initialRoadStyleWidths = DEFAULT_ROAD_STYLE_WIDTHS,
 } = {}) {
   if (!lib?.Map) throw new Error('MapLibre GL JS is not available');
   if (!container) throw new Error('Missing map container');
   let threeDEnabled = false;
-  let roadStyleWidths = normalizeRoadStyleWidths(roadStyleWidths);
+  let roadStyleWidths = normalizeRoadStyleWidths(initialRoadStyleWidths);
   let originalRoadPaint = new Map();
   const map = new lib.Map({
     container,
