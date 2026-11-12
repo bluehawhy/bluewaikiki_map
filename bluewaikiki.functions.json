@@ -1,0 +1,10 @@
+{
+  "functions": [
+    {
+      "name": "api",
+      "context": ".",
+      "dockerfile": "Dockerfile",
+      "port": 8080
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+name: bluewaikiki_map
+
+# Standalone mode: two containers (PostGIS database + combined API/importer).
+# Dashboard mode: Function deploy requires an externally managed *dedicated*
+# PostGIS instance and durable data volume. Shared DATABASE_URL is A/B only.
+services:
+  postgis:
+    image: postgis/postgis:16-3.7
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bluewaikiki_map}
+      POSTGRES_USER: ${POSTGRES_USER:-map_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run bash scripts/init-env.sh first}
+      TZ: Asia/Seoul
+    volumes:
+      - map_postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    shm_size: 128mb
+    mem_limit: 1g
+    cpus: 1.0
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - work_mem=8MB
+      - -c
+      - max_connections=35
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    networks: [map_internal]
+
+  map:
+    build: .
+    user: "${MAP_UID:-1000}:${MAP_GID:-1000}"
+    restart: unless-stopped
+    environment:
+      PGHOST: postgis
+      # DATABASE_URL is intentionally NOT passed to the map service.
+      # It belongs to optional non-map A/B functions managed by the Dashboard.
+      PGPORT: "5432"
+      PGDATABASE: ${POSTGRES_DB:-bluewaikiki_map}
+      PGUSER: ${POSTGRES_USER:-map_admin}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Run bash scripts/init-env.sh first}
+      MAP_API_TOKEN: ${MAP_API_TOKEN:?Run bash scripts/init-env.sh first}
+      MAP_RUN_SCHEDULER: ${MAP_RUN_SCHEDULER:-1}
+      MAP_DATA_DIR: /data
+      MAP_DOWNLOADER: ${MAP_DOWNLOADER:-disabled}
+      IMPORT_TIMEZONE: Asia/Seoul
+      IMPORT_START_HOUR: ${IMPORT_START_HOUR:-1}
+      IMPORT_END_HOUR: ${IMPORT_END_HOUR:-5}
+      IMPORT_CHECK_SECONDS: ${IMPORT_CHECK_SECONDS:-300}
+      IMPORT_MAX_LOAD_1M: ${IMPORT_MAX_LOAD_1M:-1.5}
+      IMPORT_MAX_UNCOMPRESSED_BYTES: ${IMPORT_MAX_UNCOMPRESSED_BYTES:-4294967296}
+      TZ: Asia/Seoul
+    ports:
+      - "127.0.0.1:${API_HOST_PORT:-18083}:8080"
+    volumes:
+      - ./data:/data
+    depends_on:
+      postgis:
+        condition: service_healthy
+    mem_limit: 768m
+    cpus: 0.75
+    read_only: true
+    tmpfs: [/tmp:size=64m]
+    networks: [map_internal]
+
+networks:
+  map_internal:
+
+volumes:
+  map_postgres_data:

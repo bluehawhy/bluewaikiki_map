@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+data/**
+!data/.gitkeep
+!data/inbox/
+!data/inbox/.gitkeep
+!data/raw/
+!data/raw/.gitkeep
+!data/work/
+!data/work/.gitkeep

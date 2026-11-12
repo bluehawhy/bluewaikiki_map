@@ -1,0 +1,8 @@
+**
+!Dockerfile
+!requirements.txt
+!app/
+!app/**
+!db/
+!db/init/
+!db/init/001_schema.sql
