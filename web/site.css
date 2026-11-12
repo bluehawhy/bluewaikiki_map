@@ -57,7 +57,17 @@ button { font: inherit; }
   cursor: pointer; border: 0; background: transparent; color: #40596a;
   font-size: 25px; line-height: 1;
 }
-.map-actions button:hover { background: #ecf5f4; color: #147568; }
+.map-actions button:hover:not(:disabled) { background: #ecf5f4; color: #147568; }
+.map-actions button:disabled { opacity: .4; cursor: wait; }
+.map-actions button.map-actions__mode {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+.map-actions button.map-actions__mode[aria-pressed="true"] {
+  background: #e1f3ee;
+  color: #127a69;
+}
 .map-actions button:focus-visible { outline: 2px solid #299f96; outline-offset: -3px; }
 .map-actions__divider { width: 29px; height: 1px; background: #e3eaf0; }
 .map-status-panel {

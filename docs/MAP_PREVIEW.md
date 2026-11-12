@@ -7,6 +7,10 @@
 - 스타일: `web/styles/bus_transit_style.json` — `bluehawhy/busstop_timer/assets/map/bus_transit_style.json` 원본과 동일
 - 벡터 타일: OpenFreeMap `https://tiles.openfreemap.org/planet` (OpenMapTiles 스키마, OSM 원천)
 - 초기 위치: 부산 연제구 `[129.0756, 35.1796]`, 줌 14 (버스타이머와 동일)
+- 오른쪽 **3D** 버튼: 건물 돌출(`fill-extrusion`), 지도 기울기 58°와 회전 -16° 적용. 버튼이 **2D**로 바뀌며 다시 누르면 평면 지도로 돌아옴. 초기 위치 복귀는 현재 2D/3D 모드를 유지.
+- 3D 건물은 OpenMapTiles `building`의 `render_height`·`render_min_height`를 활용하며 데이터에 높이가 없다면 기본 9m를 사용. `hide_3d`가 참인 건물 외곽은 3D에서 제외.
+- **지형 고도(DEM), 위성 영상, 별도 3D 모델은 사용하지 않음.** OSM 건물 높이는 지역별로 정확도가 다를 수 있으며 정밀 실측 정보가 아님.
+- 3D 레이어는 `web/map.js`에서 실행 시 추가하므로 기존 버스타이머의 2D 스타일 JSON을 변경하지 않음.
 - 정류장·실시간 교통정보·사용자 계정은 표시하지 않음. 추후 별도 API 연동.
 - DB 및 다운로드 기능 미구성 상태에서도 지도 화면은 표시됨. 지도 타일/글리프 및 CDN 네트워크는 필요.
 
@@ -31,7 +35,7 @@
 
 ## 프레임워크 전환
 - `web/map.js`의 `createMap({lib, container, styleUrl, onReady, onError})`를 사용합니다.
-- 반환 객체는 `map, zoomIn, zoomOut, reset, resize, destroy`를 제공합니다.
+- 반환 객체는 `map, zoomIn, zoomOut, reset, set3DEnabled, toggle3D, is3DEnabled, resize, destroy`를 제공합니다. 프레임워크의 버튼 상태는 `onModeChange` 콜백에서 갱신할 수 있습니다.
 - React/Vue/Svelte에서는 마운트 이후 `createMap`을 호출하고 언마운트에서 `destroy()`를 호출하면 됩니다.
 - 현재 `web/main.js`만 버튼/UI 이벤트를 연결하므로 화면 프레임워크를 바꿀 때 `map.js`와 스타일 JSON은 재사용 가능합니다.
 - Flutter 등 다른 렌더러에서는 동일한 **MapLibre Style JSON**과 타일 출처를 사용할 수 있지만, JS 렌더러 코드를 그대로 실행하는 것은 아닙니다.
