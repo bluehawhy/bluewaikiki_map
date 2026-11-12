@@ -70,6 +70,22 @@ button { font: inherit; }
 }
 .map-actions button:focus-visible { outline: 2px solid #299f96; outline-offset: -3px; }
 .map-actions__divider { width: 29px; height: 1px; background: #e3eaf0; }
+.map-actions__zoom {
+  width: 44px;
+  min-height: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 0;
+  color: #40596a;
+  background: rgba(241,247,247,.92);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.map-actions__zoom span { font-size: 8px; letter-spacing: .08em; color: #7a8996; }
+.map-actions__zoom strong { font-size: 12px; font-weight: 750; line-height: 1.2; }
 .map-status-panel {
   position: absolute; z-index: 2; bottom: max(40px, calc(env(safe-area-inset-bottom) + 34px));
   left: max(18px, env(safe-area-inset-left));
@@ -164,7 +180,7 @@ button { font: inherit; }
 }
 .road-style-panel {
   position: absolute; z-index: 3;
-  top: 282px;
+  top: 318px;
   right: max(76px, calc(env(safe-area-inset-right) + 58px));
   width: min(292px, calc(100vw - 100px));
   padding: 15px;
@@ -213,5 +229,5 @@ button { font: inherit; }
   outline: 2px solid #299f96; outline-offset: 2px;
 }
 @media (max-width: 520px) {
-  .road-style-panel { top: 270px; right: 68px; width: min(280px, calc(100vw - 84px)); }
+  .road-style-panel { top: 306px; right: 68px; width: min(280px, calc(100vw - 84px)); }
 }

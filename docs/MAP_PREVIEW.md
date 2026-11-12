@@ -7,6 +7,7 @@
 - 스타일: `web/styles/bus_transit_style.json` — `bluehawhy/busstop_timer/assets/map/bus_transit_style.json` 원본에서 분기한 사용자 지정 스타일. 건물·배경 구조는 유지하고 도로 폭/외곽선 규칙을 개편.
 - 벡터 타일: OpenFreeMap `https://tiles.openfreemap.org/planet` (OpenMapTiles 스키마, OSM 원천)
 - 초기 위치: 부산 연제구 `[129.0756, 35.1796]`, 줌 14 (버스타이머와 동일)
+- 확대·축소 버튼 아래 **현재 줌 레벨(ZOOM 14.0 형식)** 표시. 마우스 휠·터치 핀치·버튼·초기 위치 복귀·2D/3D 모드 전환에 따른 줌 변경을 소수점 첫째 자리까지 실시간 갱신합니다.
 - 오른쪽 **3D** 버튼: 건물 돌출(`fill-extrusion`), 지도 기울기 58°와 회전 -16° 적용. 버튼이 **2D**로 바뀌며 다시 누르면 평면 지도로 돌아옴. 초기 위치 복귀는 현재 2D/3D 모드를 유지.
 - **건물 속성에 따라 색상 자동 구분**: 타일에 속성이 있는 건물은 연한 주황 `#F5C79F`, 불투명도 0.7(투명도 30%). 속성이 전혀 없는 건물은 베이지 `#DDCEB5`, 불투명도 0.5(투명도 50%). 2D 건물 외곽과 3D 건물 벽·지붕에 동일 적용.
 - 건물 속성 판단 키: `render_height`, `render_min_height`, `colour`, `hide_3d`, `name`, `name:ko`. **OpenMapTiles는 줌 14 이상에서 기본 높이(예: 5m)를 자동 제공할 수 있어, 대부분의 건물이 주황색이 될 수 있음.** 주황색은 건물의 주소나 상세 용도 정보가 있다는 의미가 아님.

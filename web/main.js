@@ -4,6 +4,7 @@ import {createMap, DEFAULT_ROAD_LINE_WIDTHS, normalizeRoadLineWidths} from './ma
 const status = document.getElementById('map-status');
 const dot = document.getElementById('map-dot');
 const modeButton = document.getElementById('toggle-3d');
+const zoomLevelValue = document.getElementById('zoom-level-value');
 const dialog = document.getElementById('feature-modal');
 const copyStatus = document.getElementById('feature-modal-copy-status');
 const roadStyleButton = document.getElementById('road-style-toggle');
@@ -201,6 +202,13 @@ try {
     onFeatureClear: clearDialog,
     onError: () => updateStatus('일부 지도 타일을 불러오지 못했습니다. 네트워크를 확인해 주세요.', 'error'),
   });
+  const updateZoomLevel = () => {
+    zoomLevelValue.textContent = controller.map.getZoom().toFixed(1);
+  };
+  // MapLibre emits zoom for wheel/pinch gestures, buttons, flyTo and 2D/3D transitions.
+  controller.map.on('zoom', updateZoomLevel);
+  updateZoomLevel();
+
   document.getElementById('zoom-in').addEventListener('click', controller.zoomIn);
   document.getElementById('zoom-out').addEventListener('click', controller.zoomOut);
   document.getElementById('reset-view').addEventListener('click', controller.reset);
