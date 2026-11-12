@@ -28,6 +28,33 @@ const BUILDING_LAYER = 'bluewaikiki-3d-buildings';
 const BUILDING_DATA_LAYER = 'bluewaikiki-3d-buildings-with-data';
 const THREE_D_VIEW = Object.freeze({pitch: 58, bearing: -16, minZoom: 15.5});
 
+// User-adjustable painted line thicknesses, measured in px at zoom 17.
+// Road surface widths, lane counts, and road outline widths are untouched.
+export const DEFAULT_ROAD_LINE_WIDTHS = Object.freeze({center: 0.65, lane: 1});
+const ROAD_LINE_IDS = Object.freeze({
+  center: ['road-lane-center-two-way'],
+  lane: [
+    'road-lane-two-way-plus-1', 'road-lane-two-way-minus-1',
+    'road-lane-two-way-plus-2', 'road-lane-two-way-minus-2',
+    'road-lane-one-way-four-lanes',
+    'road-lane-one-way-six-lanes-plus', 'road-lane-one-way-six-lanes-minus',
+  ],
+});
+
+export function normalizeRoadLineWidths(values = {}) {
+  const clamp = (value, fallback) => {
+    const number = Number(value);
+    return Number.isFinite(number)
+      ? Math.round(Math.max(0.2, Math.min(3, number)) * 100) / 100
+      : fallback;
+  };
+  return {
+    center: clamp(values.center, DEFAULT_ROAD_LINE_WIDTHS.center),
+    lane: clamp(values.lane, DEFAULT_ROAD_LINE_WIDTHS.lane),
+  };
+}
+
+
 // The local map style is based on Bus Timer and now has lane-count-based road widths.
 // 3D buildings remain runtime layers so their design stays independent of road styling.
 function add3DBuildingLayer(map) {
@@ -72,10 +99,13 @@ function add3DBuildingLayer(map) {
 
 export function createMap({
   lib, container, styleUrl, onReady, onError, onModeChange, onFeatureSelect, onFeatureClear,
+  roadLineWidths = DEFAULT_ROAD_LINE_WIDTHS,
 } = {}) {
   if (!lib?.Map) throw new Error('MapLibre GL JS is not available');
   if (!container) throw new Error('Missing map container');
   let threeDEnabled = false;
+  let lineWidths = normalizeRoadLineWidths(roadLineWidths);
+  let originalLineWidths = new Map();
   const map = new lib.Map({
     container,
     style: styleUrl || new URL('./styles/bus_transit_style.json', import.meta.url).href,
@@ -132,7 +162,36 @@ export function createMap({
     return view;
   }
 
-  // Reapply if a consuming framework replaces the map style at runtime.
+  function setLineWidthsOnMap() {
+    for (const [type, ids] of Object.entries(ROAD_LINE_IDS)) {
+      const ratio = lineWidths[type] / DEFAULT_ROAD_LINE_WIDTHS[type];
+      for (const id of ids) {
+        const original = originalLineWidths.get(id);
+        if (!map.getLayer(id) || !Array.isArray(original)) continue;
+        // Keep the original zoom interpolation and scale only its width
+        // values; never multiply a zoom expression outside interpolate.
+        const resized = original.map((part, index) =>
+          index >= 4 && index % 2 === 0 && typeof part === 'number'
+            ? Math.round(part * ratio * 10000) / 10000
+            : part
+        );
+        map.setPaintProperty(id, 'line-width', resized);
+      }
+    }
+  }
+
+  function initializeLineWidths() {
+    originalLineWidths = new Map();
+    for (const id of [...ROAD_LINE_IDS.center, ...ROAD_LINE_IDS.lane]) {
+      if (map.getLayer(id)) {
+        originalLineWidths.set(id, map.getPaintProperty(id, 'line-width'));
+      }
+    }
+    setLineWidthsOnMap();
+  }
+
+  // Reapply current widths whenever a framework replaces/reloads the style.
+  map.on('style.load', initializeLineWidths);
   map.on('style.load', updateBuildingLayers);
   map.on('load', () => onReady?.(map));
   map.on('error', event => onError?.(event?.error || new Error('Map tile unavailable')));
@@ -154,6 +213,12 @@ export function createMap({
       return controller.set3DEnabled(!threeDEnabled);
     },
     is3DEnabled: () => threeDEnabled,
+    setRoadLineWidths(next) {
+      lineWidths = normalizeRoadLineWidths({...lineWidths, ...next});
+      setLineWidthsOnMap();
+      return {...lineWidths};
+    },
+    getRoadLineWidths: () => ({...lineWidths}),
     clearFeatureSelection: () => inspector.clear(),
     resize: () => map.resize(),
     destroy: () => {

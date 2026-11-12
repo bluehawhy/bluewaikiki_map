@@ -30,7 +30,34 @@
       <button type="button" id="reset-view" aria-label="부산 초기 위치로 이동" title="부산 초기 위치로 이동">⌖</button>
       <span class="map-actions__divider" aria-hidden="true"></span>
       <button type="button" class="map-actions__mode" id="toggle-3d" aria-label="3D 건물 보기" aria-pressed="false" title="건물 입체화" disabled>3D</button>
+      <span class="map-actions__divider" aria-hidden="true"></span>
+      <button type="button" class="map-actions__settings" id="road-style-toggle" aria-label="차선 두께 설정 열기" aria-expanded="false" aria-controls="road-style-panel" title="차선 두께 설정" disabled>⚙</button>
     </div>
+    <section class="road-style-panel" id="road-style-panel" aria-label="차선 두께 설정" hidden>
+      <header class="road-style-panel__header">
+        <strong>차선 두께 설정</strong>
+        <button type="button" id="road-style-close" aria-label="설정 닫기">×</button>
+      </header>
+      <p class="road-style-panel__help">줌 17 기준 · 변경 즉시 지도에 반영</p>
+      <div class="road-style-panel__field">
+        <div class="road-style-panel__label">
+          <label for="center-line-width"><span class="road-style-panel__sample road-style-panel__sample--center"></span> 중앙선 (황색 실선)</label>
+          <output id="center-line-width-value" for="center-line-width">0.65px</output>
+        </div>
+        <input id="center-line-width" type="range" min="0.2" max="3" step="0.05" value="0.65" disabled>
+      </div>
+      <div class="road-style-panel__field">
+        <div class="road-style-panel__label">
+          <label for="lane-line-width"><span class="road-style-panel__sample road-style-panel__sample--lane"></span> 차로 구분선 (흰 점선)</label>
+          <output id="lane-line-width-value" for="lane-line-width">1.00px</output>
+        </div>
+        <input id="lane-line-width" type="range" min="0.2" max="3" step="0.05" value="1" disabled>
+      </div>
+      <footer class="road-style-panel__footer">
+        <span>이 브라우저에 자동 저장돼요.</span>
+        <button type="button" id="road-style-reset">기본값 복원</button>
+      </footer>
+    </section>
     <dialog id="feature-modal" class="feature-modal" aria-labelledby="feature-modal-title">
       <header class="feature-modal__head">
         <div class="feature-modal__heading">

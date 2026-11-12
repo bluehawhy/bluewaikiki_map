@@ -1,11 +1,87 @@
 import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.17.0/dist/maplibre-gl.mjs';
-import {createMap} from './map.js';
+import {createMap, DEFAULT_ROAD_LINE_WIDTHS, normalizeRoadLineWidths} from './map.js';
 
 const status = document.getElementById('map-status');
 const dot = document.getElementById('map-dot');
 const modeButton = document.getElementById('toggle-3d');
 const dialog = document.getElementById('feature-modal');
 const copyStatus = document.getElementById('feature-modal-copy-status');
+const roadStyleButton = document.getElementById('road-style-toggle');
+const roadStylePanel = document.getElementById('road-style-panel');
+const centerWidthInput = document.getElementById('center-line-width');
+const laneWidthInput = document.getElementById('lane-line-width');
+const centerWidthValue = document.getElementById('center-line-width-value');
+const laneWidthValue = document.getElementById('lane-line-width-value');
+const ROAD_STYLE_STORAGE_KEY = 'bluewaikiki-map-road-line-widths-v1';
+
+function readRoadLineWidths() {
+  try {
+    const value = window.localStorage.getItem(ROAD_STYLE_STORAGE_KEY);
+    if (value) return normalizeRoadLineWidths(JSON.parse(value));
+  } catch (error) {
+    console.warn('Could not read saved line widths:', error);
+  }
+  return {...DEFAULT_ROAD_LINE_WIDTHS};
+}
+
+function storeRoadLineWidths(values) {
+  try {
+    window.localStorage.setItem(ROAD_STYLE_STORAGE_KEY, JSON.stringify(values));
+  } catch (error) {
+    // Private browsing / disabled storage: current view still works.
+    console.warn('Line width preferences could not be saved:', error);
+  }
+}
+
+const savedRoadLineWidths = readRoadLineWidths();
+
+function reflectRoadLineWidths(values) {
+  centerWidthInput.value = String(values.center);
+  laneWidthInput.value = String(values.lane);
+  centerWidthValue.textContent = values.center.toFixed(2) + 'px';
+  laneWidthValue.textContent = values.lane.toFixed(2) + 'px';
+}
+
+function setRoadStylePanelOpen(open) {
+  roadStylePanel.hidden = !open;
+  roadStyleButton.setAttribute('aria-expanded', String(open));
+  roadStyleButton.setAttribute('aria-label', open ? '차선 두께 설정 닫기' : '차선 두께 설정 열기');
+}
+
+function applyRoadLineWidths(values) {
+  const next = controller?.setRoadLineWidths(values)
+    || normalizeRoadLineWidths(values);
+  reflectRoadLineWidths(next);
+  storeRoadLineWidths(next);
+}
+
+reflectRoadLineWidths(savedRoadLineWidths);
+roadStyleButton.addEventListener('click', () => {
+  setRoadStylePanelOpen(roadStylePanel.hidden);
+});
+document.getElementById('road-style-close').addEventListener('click', () => {
+  setRoadStylePanelOpen(false);
+  roadStyleButton.focus();
+});
+centerWidthInput.addEventListener('input', () =>
+  applyRoadLineWidths({center: Number(centerWidthInput.value)}));
+laneWidthInput.addEventListener('input', () =>
+  applyRoadLineWidths({lane: Number(laneWidthInput.value)}));
+document.getElementById('road-style-reset').addEventListener('click', () =>
+  applyRoadLineWidths({...DEFAULT_ROAD_LINE_WIDTHS}));
+document.addEventListener('pointerdown', event => {
+  if (!roadStylePanel.hidden &&
+      !roadStylePanel.contains(event.target) &&
+      !roadStyleButton.contains(event.target)) {
+    setRoadStylePanelOpen(false);
+  }
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !roadStylePanel.hidden) {
+    setRoadStylePanelOpen(false);
+    roadStyleButton.focus();
+  }
+});
 let selectedJSON = '';
 let controller;
 
@@ -112,7 +188,11 @@ try {
   controller = createMap({
     lib: maplibregl,
     container: 'map',
+    roadLineWidths: savedRoadLineWidths,
     onReady: () => {
+      roadStyleButton.disabled = false;
+      centerWidthInput.disabled = false;
+      laneWidthInput.disabled = false;
       modeButton.disabled = false;
       updateModeButton(false);
     },

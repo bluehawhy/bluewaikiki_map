@@ -39,6 +39,8 @@
 - 일방통행으로 축소된 3차로: 점선 2개, 2차로: 점선 1개, 1차로와 0.5배 폭의 소형도로: 내부선 없음. **일방통행 도로에는 황색 중앙선을 그리지 않습니다.**
 - 도로 내부는 **아스팔트 회색 `#656C74`**, 도로 양쪽 외곽은 **짙은 회색 `#414953`**로 채웁니다. 중앙선은 **황색 `#F4C542` 실선**, 차로 구분선은 **백색 `#FFFFFF` 점선**으로 표시합니다. 도로명은 어두운 노면에서 읽을 수 있도록 밝은 글자와 어두운 테두리를 사용합니다.
 - 내부 차로선은 별도 `road-lane-*` 벡터 스타일 레이어로 도로 노면 위에 그립니다. **중앙선은 줌 15부터, 차로 구분선은 줌 15.5부터** 표시하여 멀리서 차로선이 겹쳐 보이지 않도록 합니다.
+- 우측 **⚙ 차선 두께 설정** 위젯에서는 중앙선(황색 실선)과 차로 구분선(백색 점선)을 **각각 0.2~3px(줌 17 기준, 0.05px 단위)** 조절할 수 있습니다. 기본값 중앙선 0.65px·구분선 1px. 드래그 즉시 MapLibre `setPaintProperty`로 반영하며 원래 확대 단계별 폭의 비율을 유지합니다. **기본값 복원** 버튼과 브라우저 `localStorage` 저장(`bluewaikiki-map-road-line-widths-v1`)을 지원합니다. 브라우저마다 개별 설정이며 서버나 DB에는 저장하지 않습니다.
+- 이 설정은 내부 차선 표시 두께만 변경합니다. 아스팔트 노면 폭, 도로 외곽선, 차로 개수, `oneway` 규칙, 건물·도로 속성 모달에는 영향을 주지 않습니다.
 - 렌더링 순서는 **도로 외곽선 → 아스팔트 노면 → 중앙선·차로 구분선**입니다. 교차점에서도 동일한 도로 색을 사용해 노면은 이어지지만, 타일에 교차로 면이나 차선 단절 위치가 없으므로 교차로 중앙의 차로선 일부는 겹칠 수 있습니다(교차로별 정밀 처리 미구현).
 - 화면 폭의 줌별 차로 배율: 줌 10 = 0.24px, 줌 14 = 1px, 줌 17 = 3.2px, 줌 19 = 6.4px. 확대/축소 시 너비와 구분선의 `line-offset`이 같은 비율로 조절됩니다. 왕복 1차로에는 기본 차로 배율 0.5가 적용됩니다.
 - **고속도로·주요 간선도로**(`motorway`·`trunk`)는 진한 황갈색 외곽선을 내부 폭의 1.33배로 적용하고, 다른 주요도로는 1.12배, 일반도로는 1.2배를 적용합니다.
@@ -66,7 +68,7 @@
 
 ## 프레임워크 전환
 - `web/map.js`의 `createMap({lib, container, styleUrl, onReady, onError})`를 사용합니다.
-- 반환 객체는 `map, zoomIn, zoomOut, reset, set3DEnabled, toggle3D, is3DEnabled, clearFeatureSelection, resize, destroy`를 제공합니다. 프레임워크의 버튼 상태는 `onModeChange`, 클릭 객체는 `onFeatureSelect`/`onFeatureClear` 콜백으로 전달됩니다. 모달은 `web/main.js`, 선택·강조는 `web/feature-inspector.js`가 담당합니다.
+- 반환 객체는 `map, zoomIn, zoomOut, reset, set3DEnabled, toggle3D, is3DEnabled, setRoadLineWidths, getRoadLineWidths, clearFeatureSelection, resize, destroy`를 제공합니다. 프레임워크의 버튼 상태는 `onModeChange`, 클릭 객체는 `onFeatureSelect`/`onFeatureClear` 콜백으로 전달됩니다. 모달은 `web/main.js`, 선택·강조는 `web/feature-inspector.js`가 담당합니다.
 - React/Vue/Svelte에서는 마운트 이후 `createMap`을 호출하고 언마운트에서 `destroy()`를 호출하면 됩니다.
 - 현재 `web/main.js`만 버튼/UI 이벤트를 연결하므로 화면 프레임워크를 바꿀 때 `map.js`와 스타일 JSON은 재사용 가능합니다.
 - Flutter 등 다른 렌더러에서는 동일한 **MapLibre Style JSON**과 타일 출처를 사용할 수 있지만, JS 렌더러 코드를 그대로 실행하는 것은 아닙니다.
