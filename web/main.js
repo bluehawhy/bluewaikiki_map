@@ -44,52 +44,64 @@ function storeRoadStyleWidths(values) {
 const savedRoadStyleWidths = readRoadStyleWidths();
 
 function reflectRoadStyleWidths(values) {
-  roadWidthInput.value = String(values.road);
-  centerWidthInput.value = String(values.center);
-  roadWidthValue.textContent = values.road.toFixed(2) + '배';
-  centerWidthValue.textContent = values.center.toFixed(2) + 'px';
+  // Cached HTML can temporarily be older than main.js after a deployment.
+  // Never prevent the map from starting when a settings widget is missing.
+  if (roadWidthInput) roadWidthInput.value = String(values.road);
+  if (centerWidthInput) centerWidthInput.value = String(values.center);
+  if (roadWidthValue) roadWidthValue.textContent = values.road.toFixed(2) + '배';
+  if (centerWidthValue) centerWidthValue.textContent = values.center.toFixed(2) + 'px';
 }
 
 function setRoadStylePanelOpen(open) {
+  if (!roadStylePanel || !roadStyleButton) return;
   roadStylePanel.hidden = !open;
   roadStyleButton.setAttribute('aria-expanded', String(open));
   roadStyleButton.setAttribute('aria-label', open ? '도로 폭 설정 닫기' : '도로 폭 설정 열기');
 }
 
 function applyRoadStyleWidths(values) {
-  const next = controller?.setRoadStyleWidths(values)
-    || normalizeRoadStyleWidths(values);
+  const next = (controller && typeof controller.setRoadStyleWidths === 'function')
+    ? controller.setRoadStyleWidths(values) : normalizeRoadStyleWidths(values);
   reflectRoadStyleWidths(next);
   storeRoadStyleWidths(next);
 }
 
-reflectRoadStyleWidths(savedRoadStyleWidths);
-roadStyleButton.addEventListener('click', () => {
-  setRoadStylePanelOpen(roadStylePanel.hidden);
-});
-document.getElementById('road-style-close').addEventListener('click', () => {
-  setRoadStylePanelOpen(false);
-  roadStyleButton.focus();
-});
-roadWidthInput.addEventListener('input', () =>
-  applyRoadStyleWidths({road: Number(roadWidthInput.value)}));
-centerWidthInput.addEventListener('input', () =>
-  applyRoadStyleWidths({center: Number(centerWidthInput.value)}));
-document.getElementById('road-style-reset').addEventListener('click', () =>
-  applyRoadStyleWidths({...DEFAULT_ROAD_STYLE_WIDTHS}));
-document.addEventListener('pointerdown', event => {
-  if (!roadStylePanel.hidden &&
-      !roadStylePanel.contains(event.target) &&
-      !roadStyleButton.contains(event.target)) {
-    setRoadStylePanelOpen(false);
-  }
-});
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && !roadStylePanel.hidden) {
+// The road controls are optional: a stale/cached layout must not leave
+// the entire map blank. The map is initialized independently below.
+if (roadStyleButton && roadStylePanel && centerWidthInput && roadWidthInput &&
+    centerWidthValue && roadWidthValue &&
+    document.getElementById('road-style-close') &&
+    document.getElementById('road-style-reset')) {
+  reflectRoadStyleWidths(savedRoadStyleWidths);
+  roadStyleButton.addEventListener('click', () => {
+    setRoadStylePanelOpen(roadStylePanel.hidden);
+  });
+  document.getElementById('road-style-close').addEventListener('click', () => {
     setRoadStylePanelOpen(false);
     roadStyleButton.focus();
-  }
-});
+  });
+  roadWidthInput.addEventListener('input', () =>
+    applyRoadStyleWidths({road: Number(roadWidthInput.value)}));
+  centerWidthInput.addEventListener('input', () =>
+    applyRoadStyleWidths({center: Number(centerWidthInput.value)}));
+  document.getElementById('road-style-reset').addEventListener('click', () =>
+    applyRoadStyleWidths({...DEFAULT_ROAD_STYLE_WIDTHS}));
+  document.addEventListener('pointerdown', event => {
+    if (!roadStylePanel.hidden &&
+        !roadStylePanel.contains(event.target) &&
+        !roadStyleButton.contains(event.target)) {
+      setRoadStylePanelOpen(false);
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !roadStylePanel.hidden) {
+      setRoadStylePanelOpen(false);
+      roadStyleButton.focus();
+    }
+  });
+} else {
+  console.warn('Road-width controls are unavailable in this layout; continuing map startup.');
+}
 let selectedJSON = '';
 let controller;
 
@@ -198,10 +210,12 @@ try {
     container: 'map',
     roadStyleWidths: savedRoadStyleWidths,
     onReady: () => {
-      roadStyleButton.disabled = false;
-      centerWidthInput.disabled = false;
-      roadWidthInput.disabled = false;
-      modeButton.disabled = false;
+      if (roadStyleButton && roadStylePanel && roadWidthInput && centerWidthInput) {
+        roadStyleButton.disabled = false;
+        centerWidthInput.disabled = false;
+        roadWidthInput.disabled = false;
+      }
+      if (modeButton) modeButton.disabled = false;
       updateModeButton(false);
     },
     onModeChange: updateModeButton,
@@ -210,7 +224,7 @@ try {
     onError: () => updateStatus('일부 지도 타일을 불러오지 못했습니다. 네트워크를 확인해 주세요.', 'error'),
   });
   const updateZoomLevel = () => {
-    zoomLevelValue.textContent = controller.map.getZoom().toFixed(1);
+    if (zoomLevelValue) zoomLevelValue.textContent = controller.map.getZoom().toFixed(1);
   };
   // MapLibre emits zoom for wheel/pinch gestures, buttons, flyTo and 2D/3D transitions.
   controller.map.on('zoom', updateZoomLevel);
@@ -219,7 +233,7 @@ try {
   document.getElementById('zoom-in').addEventListener('click', controller.zoomIn);
   document.getElementById('zoom-out').addEventListener('click', controller.zoomOut);
   document.getElementById('reset-view').addEventListener('click', controller.reset);
-  modeButton.addEventListener('click', controller.toggle3D);
+  modeButton?.addEventListener('click', controller.toggle3D);
 } catch (error) {
   console.error('Map preview initialization failed:', error);
   updateStatus('지도를 시작하지 못했습니다. WebGL 지원과 네트워크를 확인해 주세요.', 'error');

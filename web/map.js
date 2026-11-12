@@ -179,7 +179,8 @@ export function createMap({
 
   function setRoadPaintOnMap() {
     function apply(id, property, factor) {
-      if (!map.getLayer(id)) return;
+      // Avoid rewriting unchanged paint expressions during initial style load.
+      if (factor === 1 || !map.getLayer(id)) return;
       const key = id + ':' + property;
       const original = originalRoadPaint.get(key);
       if (original === undefined) return;
@@ -208,7 +209,13 @@ export function createMap({
         originalRoadPaint.set(id + ':' + property, map.getPaintProperty(id, property));
       }
     }
-    setRoadPaintOnMap();
+    try {
+      setRoadPaintOnMap();
+    } catch (error) {
+      // Styling preferences are optional. A malformed saved setting must
+      // never stop MapLibre's base map or its 'load' lifecycle.
+      console.warn('Could not apply road-width preferences; default map style remains.', error);
+    }
   }
 
   // Reapply current widths whenever a framework replaces/reloads the style.
