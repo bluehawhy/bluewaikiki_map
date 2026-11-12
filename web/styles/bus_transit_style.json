@@ -1,6 +1,6 @@
 {
   "version": 8,
-  "name": "BlueWaikiki Map — Lane-aware Transit Roads",
+  "name": "BlueWaikiki Map — Asphalt Lane Roads",
   "glyphs": "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
   "sources": {
     "openmaptiles": {
@@ -104,7 +104,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#D5DFE9",
+        "line-color": "#414953",
         "line-width": [
           "interpolate",
           [
@@ -282,7 +282,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#FFFFFF",
+        "line-color": "#656C74",
         "line-width": [
           "interpolate",
           [
@@ -461,18 +461,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": [
-          "match",
-          [
-            "get",
-            "class"
-          ],
-          "motorway",
-          "#B78038",
-          "trunk",
-          "#C99750",
-          "#F3D17A"
-        ],
+        "line-color": "#414953",
         "line-width": [
           "interpolate",
           [
@@ -712,7 +701,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#FFF7E6",
+        "line-color": "#656C74",
         "line-width": [
           "interpolate",
           [
@@ -931,7 +920,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#CB8B2B",
+        "line-color": "#F4C542",
         "line-width": [
           "interpolate",
           [
@@ -1008,7 +997,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A3AEB7",
+        "line-color": "#FFFFFF",
         "line-width": [
           "interpolate",
           [
@@ -1089,7 +1078,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A3AEB7",
+        "line-color": "#FFFFFF",
         "line-width": [
           "interpolate",
           [
@@ -1168,7 +1157,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A3AEB7",
+        "line-color": "#FFFFFF",
         "line-width": [
           "interpolate",
           [
@@ -1247,7 +1236,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A3AEB7",
+        "line-color": "#FFFFFF",
         "line-width": [
           "interpolate",
           [
@@ -1327,7 +1316,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A3AEB7",
+        "line-color": "#FFFFFF",
         "line-width": [
           "interpolate",
           [
@@ -1406,7 +1395,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A3AEB7",
+        "line-color": "#FFFFFF",
         "line-width": [
           "interpolate",
           [
@@ -1485,7 +1474,7 @@
         "line-join": "round"
       },
       "paint": {
-        "line-color": "#A3AEB7",
+        "line-color": "#FFFFFF",
         "line-width": [
           "interpolate",
           [
@@ -1623,8 +1612,8 @@
         "text-size": 10
       },
       "paint": {
-        "text-color": "#8A9AA8",
-        "text-halo-color": "#FFFFFF",
+        "text-color": "#F3F6F8",
+        "text-halo-color": "#414953",
         "text-halo-width": 1.1
       }
     }
