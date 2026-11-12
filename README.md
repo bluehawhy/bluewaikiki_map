@@ -2,6 +2,24 @@
 
 BlueWaikiki의 **지도 데이터 수집·보관·조회 전용 프로젝트**. 이 저장소의 독립 PostGIS와 BlueWaikiki 대시보드의 공용 PostgreSQL을 역할별로 병행할 수 있는 **하이브리드 DB 설계**입니다. 지도 기능에 공용 PostgreSQL을 사용하지 않습니다.
 
+## 임시 웹 지도 (HTML + JavaScript)
+
+DB와 지도 다운로드를 준비하기 전에도 **버스타이머와 동일한 지도 스타일**을 바로 확인할 수 있습니다.
+
+- `web/index.html` — 브라우저 전체 화면 지도, 이동·확대·축소·초기 위치 복귀
+- `web/map.js` — 프레임워크 독립 MapLibre 지도 모듈 (추후 React/Vue 등에서 재사용)
+- `web/styles/bus_transit_style.json` — 버스타이머 지도 스타일 원본 복제
+- 벡터 지도: OpenFreeMap 제공 / OpenMapTiles 형식 / OSM 원천
+- 초기 중심: 부산 연제구, 줌 14
+- 지도 페이지는 PostGIS가 없어도 표시됩니다. `/health`는 웹 준비 상태, `/v1/health/db`는 별도 PostGIS 상태 확인입니다.
+- 정류장·버스 노선 정보는 아직 연동하지 않습니다.
+
+간단한 미리보기: `cd web && python3 -m http.server 8000` → `http://localhost:8000/`
+
+기존 FastAPI Docker에서도 웹 루트 `/`로 함께 제공합니다. 대시보드 등록 시 `https://api.bluewaikiki.top/<slug>/` 경로를 지원합니다. DB/서버 배포는 아직 하지 않았습니다.
+
+자세한 구성: [지도 미리보기·프레임워크 연동](docs/MAP_PREVIEW.md).
+
 ## 확정 구조
 
 ```text

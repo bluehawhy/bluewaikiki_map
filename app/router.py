@@ -2,6 +2,8 @@
 import os
 from urllib.parse import urlsplit
 
+from starlette.responses import RedirectResponse
+
 from app.api import app as application
 
 
@@ -13,6 +15,9 @@ class StripDashboardPrefix:
         if scope['type'] in ('http', 'websocket'):
             base = (os.getenv('BASE_PATH') or urlsplit(os.getenv('PUBLIC_API_URL', '')).path).rstrip('/')
             path = scope.get('path', '')
+            if base.startswith('/') and base and path == base and scope['type'] == 'http':
+                await RedirectResponse(base + '/', status_code=307)(scope, receive, send)
+                return
             if base.startswith('/') and base and (path == base or path.startswith(base + '/')):
                 scope = dict(scope)
                 scope['path'] = path[len(base):] or '/'

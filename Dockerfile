@@ -17,6 +17,7 @@ WORKDIR /srv
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
+COPY web ./web
 COPY db/init/001_schema.sql ./db/init/001_schema.sql
 RUN useradd -r -u 10001 -d /srv mapuser \
     && mkdir -p /data/inbox /data/raw /data/work \

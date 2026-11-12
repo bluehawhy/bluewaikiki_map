@@ -1,9 +1,11 @@
 """Read-only geospatial API; all spatial data comes from validated active snapshots."""
 import os
 import secrets
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Response
+from fastapi.staticfiles import StaticFiles
 from psycopg.rows import dict_row
 
 from app.db import connect
@@ -42,6 +44,13 @@ def parse_bbox(value: str) -> tuple[float, float, float, float]:
 
 @app.get('/health')
 def health():
+    """Lightweight app readiness: public vector map does not require PostGIS."""
+    return {'status': 'ok', 'map': 'public-vector-preview'}
+
+
+@app.get('/v1/health/db', dependencies=protected)
+def database_health():
+    """Independent PostGIS availability; intentionally separate from app readiness."""
     try:
         with connect() as conn:
             status = conn.execute("""
@@ -172,3 +181,8 @@ def tile(z: int, x: int, y: int,
             ''', (z, x, y, layer, dataset_key, dataset_key))
             data = cur.fetchone()[0] or b''
     return Response(content=bytes(data), media_type='application/vnd.mapbox-vector-tile')
+
+# Mount last: authenticated /v1/* endpoints and /health take precedence.
+# Assets resolve under the Dashboard slug because the browser uses relative paths.
+WEB_ROOT = Path(__file__).resolve().parent.parent / 'web'
+app.mount('/', StaticFiles(directory=str(WEB_ROOT), html=True), name='map-preview')

@@ -1,0 +1,33 @@
+# 지도 미리보기 (프레임워크 미선정)
+
+현재는 버스타이머의 **실제 벡터 지도 스타일**을 그대로 복제하여 보여주는 HTML/CSS/JavaScript 지도 화면입니다.
+
+## 사용 기술
+- 렌더러: MapLibre GL JS 6.17.0 (ES Module CDN)
+- 스타일: `web/styles/bus_transit_style.json` — `bluehawhy/busstop_timer/assets/map/bus_transit_style.json` 원본과 동일
+- 벡터 타일: OpenFreeMap `https://tiles.openfreemap.org/planet` (OpenMapTiles 스키마, OSM 원천)
+- 초기 위치: 부산 연제구 `[129.0756, 35.1796]`, 줌 14 (버스타이머와 동일)
+- 정류장·실시간 교통정보·사용자 계정은 표시하지 않음. 추후 별도 API 연동.
+- DB 및 다운로드 기능 미구성 상태에서도 지도 화면은 표시됨. 지도 타일/글리프 및 CDN 네트워크는 필요.
+
+## 실행
+- 독립 정적 페이지: `cd web && python3 -m http.server 8000` 다음 `http://localhost:8000`
+- 기존 FastAPI: `python -m app.runner` 다음 `http://localhost:8080/` (필요한 Python 패키지 설치 시)
+- Dashboard Function: 배포 시 `https://api.bluewaikiki.top/<project-slug>/` (별도 프로젝트 등록 및 배포 필요)
+- `/health`는 **웹 서버 준비 상태**만 조회. PostGIS 준비 확인은 Bearer 토큰을 사용하는 `/v1/health/db`.
+- HTML 파일을 `file://`로 직접 여는 방식은 모듈/스타일 로딩 문제를 일으킬 수 있으므로 HTTP 서버 권장.
+
+## 프레임워크 전환
+- `web/map.js`의 `createMap({lib, container, styleUrl, onReady, onError})`를 사용합니다.
+- 반환 객체는 `map, zoomIn, zoomOut, reset, resize, destroy`를 제공합니다.
+- React/Vue/Svelte에서는 마운트 이후 `createMap`을 호출하고 언마운트에서 `destroy()`를 호출하면 됩니다.
+- 현재 `web/main.js`만 버튼/UI 이벤트를 연결하므로 화면 프레임워크를 바꿀 때 `map.js`와 스타일 JSON은 재사용 가능합니다.
+- Flutter 등 다른 렌더러에서는 동일한 **MapLibre Style JSON**과 타일 출처를 사용할 수 있지만, JS 렌더러 코드를 그대로 실행하는 것은 아닙니다.
+
+## 서버 DB와 분리
+공용 `DATABASE_URL` 및 독립 PostGIS `MAP_DATABASE_URL`은 지도 미리보기에 필요하지 않습니다. 향후 자체 데이터 제공 시 스타일의 source URL을 점진적으로 바꿀 수 있도록 스타일은 별도 JSON으로 유지합니다.
+
+## 출처
+- OpenFreeMap · OpenMapTiles · © OpenStreetMap contributors
+- MapLibre GL JS: https://maplibre.org/maplibre-gl-js/docs/
+- 버스타이머 원본 스타일: https://github.com/bluehawhy/busstop_timer/blob/main/assets/map/bus_transit_style.json

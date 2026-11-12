@@ -15,10 +15,13 @@ from app.scheduler import main as run_scheduler
 
 def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-    if initialize_schema() and os.getenv('MAP_RUN_SCHEDULER', '0') == '1':
-        Thread(name='map-scheduler', target=run_scheduler, daemon=True).start()
+    if os.getenv('MAP_RUN_SCHEDULER', '0') == '1':
+        if initialize_schema():
+            Thread(name='map-scheduler', target=run_scheduler, daemon=True).start()
+        else:
+            logging.warning('map_importer_not_started: PostGIS unavailable')
     else:
-        logging.warning('map_importer_not_started: prerequisite unavailable or disabled')
+        logging.info('public_map_preview_mode: database and importer not required')
     uvicorn.run('app.router:asgi', host='0.0.0.0', port=int(os.getenv('PORT', '8080')), workers=1)
 
 
